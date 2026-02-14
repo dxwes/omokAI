@@ -26,7 +26,7 @@ let aiThinking = false;
 
 function resizeBoard(){
     const board = document.getElementById("board");
-    canvas.height = Math.min(board.clientHeight * 0.9, 600);
+    canvas.height = canvas.height = Math.min(board.clientHeight, board.clientWidth) * 0.9;
     canvas.width = canvas.height;
     cell = canvas.width / size;
     margin = cell * 0.5;
@@ -227,5 +227,6 @@ canvas.addEventListener('click', (event) => {
 
 window.addEventListener('load', resizeBoard);
 window.addEventListener('resize', resizeBoard);
+
 
 draw();
