@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오목 대결</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            user-select: none;
+        }
+
+        .app {
+            width: calc(90vh - 120px);
+            height: 90vh;
+            background: #020617;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .screens {
+            display: flex;
+            width: 200%;
+            height: calc(100% - 70px);
+            transition: transform 0.4s ease;
+        }
+
+        .screen {
+            width: 50%;
+            padding: 24px;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .screen::-webkit-scrollbar {
+            display: none;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .panel:hover {
+            background: #1e293b;
+        }
+
+        .panel-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .option {
+            background: #020617;
+            border: 1px solid #1e293b;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            background: #0f172a;
+            color: white;
+        }
+
+        .option.selected {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 6px;
+        }
+
+        .board {
+            margin: 20px auto 0;
+            margin-top: 20px;
+            height: calc(100% - 70px);
+            aspect-ratio: 1 / 1;
+            max-width: 100%;
+            background: #1e293b;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bottom-bar {
+            height: 70px;
+            background: #020617;
+            border-top: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .tab {
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+        .tab.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        #newGame {
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 20px;
+            background: #2563eb;
+            font-weight: 600;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #newGame:hover {
+            background: #3b82f6;
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 20px
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="app">
+        <div class="screens" id="screens">
+            <div class="screen">
+                <div class="title">오목 플레이</div>
+                <div class="board">
+                    <canvas id="boardCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="screen">
+                <div class="title">설정</div>
+
+                <div class="panel expandable" onclick="togglePanel('difficulty')">
+                    난이도 설정
+                </div>
+                <div class="panel-options" id="difficulty">
+                    <div class="option" onclick="selectOption(event, 'difficulty', this, 0)">매우 쉬움</div>
+                    <div class="option" onclick="selectOption(event, 'difficulty', this, 1)">쉬움</div>
+                    <div class="option selected" onclick="selectOption(event, 'difficulty', this, 2)">보통</div>
+                    <div class="option" onclick="selectOption(event, 'difficulty', this, 3)">어려움</div>
+                    <div class="option" onclick="selectOption(event, 'difficulty', this, 4)">매우 어려움</div>
+                </div>
+
+                <div class="panel expandable" onclick="togglePanel('ai')">
+                    AI 색
+                </div>
+                <div class="panel-options" id="ai">
+                    <div class="option" onclick="selectOption(event, 'ai', this, 0)">AI 흑돌</div>
+                    <div class="option selected" onclick="selectOption(event, 'ai', this, 1)">AI 백돌</div>
+                </div>
+
+                <div class="panel expandable" onclick="togglePanel('rule')">
+                    룰
+                </div>
+                <div class="panel-options" id="rule">
+                    <div class="option selected" onclick="selectOption(event, 'rule', this, 0)">금수 없음(자유)</div>
+                    <div class="option" onclick="selectOption(event, 'rule', this, 1)">금수 있음(렌주)</div>
+                </div>
+
+                <div class="newGame" id="newGame" onclick="reset()"> 새 게임 만들기 </div>
+
+
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="tab active" onclick="switchScreen(0)" id="tab-play">플레이</div>
+            <div class="tab" onclick="switchScreen(1)" id="tab-settings">설정</div>
+        </div>
+    </div>
+
+    <script>
+        const screens = document.getElementById('screens');
+        const tabPlay = document.getElementById('tab-play');
+        const tabSettings = document.getElementById('tab-settings');
+
+        const settings = {
+            difficulty: 2,
+            ai: 1,
+            rule: 0
+        };
+
+        function togglePanel(id) {
+            const panel = document.getElementById(id);
+            const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px';
+            panel.style.maxHeight = isOpen ? '0px' : (panel.scrollHeight + 10) + 'px';
+        }
+
+        function selectOption(event, group, element, num) {
+            event.stopPropagation();
+            const options = document.querySelectorAll(`#${group} .option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            settings[group] = num;
+        }
+
+        function switchScreen(index) {
+            screens.style.transform = `translateX(-${index * 50}%)`;
+
+            tabSettings.classList.remove('active');
+            tabPlay.classList.remove('active');
+
+            if (index === 0) tabPlay.classList.add('active');
+            if (index === 1) tabSettings.classList.add('active');
+        }
+
+        function getSelected(group) {
+            const selected = document.querySelector(`#${group} .option.selected`);
+            return selected ? selected.textContent : null;
+        }
+    </script>
+
+    <script src="omok2.js"></script>
+    <script src="omok.js"></script>
+</body>
+
+</html>
