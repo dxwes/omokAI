@@ -1,16 +1,13 @@
 const canvas = document.getElementById("boardCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 600;
-canvas.height = 600;
-
 let stones = [];
 let forbiddenPoints = [];
 let winStones = [];
 
 const size = 15;
-const cell = canvas.width / size;
-const margin = cell * 0.5;
+let cell = 0;
+let margin = 0;
 
 let hoverX = null;
 let hoverY = null;
@@ -26,6 +23,15 @@ let turn = 0;
 let rule = 0;
 
 let aiThinking = false;
+
+function resizeBoard(){
+    const board = document.getElementById("board");
+    canvas.height = Math.min(board.clientHeight * 0.9, 600);
+    canvas.width = canvas.height;
+    cell = canvas.width / size;
+    margin = cell * 0.5;
+    draw();
+}
 
 worker.onmessage = function (e) {
     const { type, data } = e.data;
@@ -217,7 +223,9 @@ canvas.addEventListener('click', (event) => {
     if(aiThinking == false){
         worker.postMessage({ type: "PLAYER_MOVE", data: { pos: i } });
     }
-    
 });
+
+window.addEventListener('load', resizeBoard);
+window.addEventListener('resize', resizeBoard);
 
 draw();
