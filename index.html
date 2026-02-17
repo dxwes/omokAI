@@ -175,7 +175,7 @@
     <div class="app">
         <div class="screens" id="screens">
             <div class="screen">
-                <div class="title">오목 플레이</div>
+                <div class="title" id = "title">오목 플레이</div>
                 <div class="board" id = "board">
                     <canvas id="boardCanvas"></canvas>
                 </div>
@@ -189,8 +189,8 @@
                 </div>
                 <div class="panel-options" id="difficulty">
                     <div class="option" onclick="selectOption(event, 'difficulty', this, 0)">매우 쉬움</div>
-                    <div class="option" onclick="selectOption(event, 'difficulty', this, 1)">쉬움</div>
-                    <div class="option selected" onclick="selectOption(event, 'difficulty', this, 2)">보통</div>
+                    <div class="option selected" onclick="selectOption(event, 'difficulty', this, 1)">쉬움</div>
+                    <div class="option" onclick="selectOption(event, 'difficulty', this, 2)">보통</div>
                     <div class="option" onclick="selectOption(event, 'difficulty', this, 3)">어려움</div>
                     <div class="option" onclick="selectOption(event, 'difficulty', this, 4)">매우 어려움</div>
                 </div>
@@ -229,7 +229,7 @@
         const tabSettings = document.getElementById('tab-settings');
 
         const settings = {
-            difficulty: 2,
+            difficulty: 1,
             ai: 1,
             rule: 0
         };

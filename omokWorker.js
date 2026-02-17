@@ -20,7 +20,6 @@ function getForbidden() {
             points.push(i);
         }
     }
-    console.log(points);
     return points;
 }
 
@@ -34,7 +33,6 @@ onmessage = function (e) {
     const { type, data } = e.data;
 
     if (type === "AI_MOVE") {
-        console.log("start");
         const aiPos = Module._omok_ai_move(data.timeLimit, data.depth);
         if (Module._board_move(aiPos)) {
             postMessage({
@@ -42,7 +40,8 @@ onmessage = function (e) {
                 data: {
                     pos: aiPos,
                     color: 1 - Module._board_turn(),
-                    forbidden: getForbidden()
+                    forbidden: getForbidden(),
+                    gameover: Module._board_is_game_over()
                 }
             });
 
@@ -76,7 +75,8 @@ onmessage = function (e) {
                 data: {
                     pos: data.pos,
                     color: 1 - Module._board_turn(),
-                    forbidden: getForbidden()
+                    forbidden: getForbidden(),
+                    gameover: Module._board_is_game_over()
                 }
             });
         }

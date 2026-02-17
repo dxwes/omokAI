@@ -1,5 +1,6 @@
 const canvas = document.getElementById("boardCanvas");
 const ctx = canvas.getContext("2d");
+const title = document.getElementById("title");
 
 let stones = [];
 let forbiddenPoints = [];
@@ -15,7 +16,8 @@ let hoverY = null;
 const worker = new Worker('omokWorker.js');
 const seed = generateRandomSeed();
 
-const aiTimeTable = [0.03, 0.2, 1.0, 3.0, 10.0];
+const aiTimeTable = [0.1, 0.2, 1.0, 3.0, 15.0];
+const aiMaxDepth = [3, 7, 0, 0, 0];
 
 let aiTimeLimit = 1.0;
 let aiColor = 1;
@@ -24,9 +26,9 @@ let rule = 0;
 
 let aiThinking = false;
 
-function resizeBoard(){
+function resizeBoard() {
     const board = document.getElementById("board");
-    canvas.height = canvas.height = Math.min(board.clientHeight, board.clientWidth) * 0.9;
+    canvas.height = Math.min(board.clientHeight, board.clientWidth) * 0.9;
     canvas.width = canvas.height;
     cell = canvas.width / size;
     margin = cell * 0.5;
@@ -42,18 +44,25 @@ worker.onmessage = function (e) {
     }
 
     else if (type == "PLACE") {
+        if (settings.difficulty >= 3) {
+            title.textContent = "오목 플레이";
+        }
+
         aiThinking = false;
         const color = (data.color == 0) ? "black" : "white";
         stones.push({ x: Math.floor(data.pos / 15), y: data.pos % 15, color: color });
         forbiddenPoints = data.forbidden;
 
-        if (data.color == 1 - aiColor) {
+        if (data.color == 1 - aiColor && data.gameover == 0) {
             aiThinking = true;
+            if (settings.difficulty >= 3) {
+                title.textContent = "오목 플레이(AI Thinking)";
+            }
             worker.postMessage({
                 type: "AI_MOVE",
                 data: {
                     timeLimit: aiTimeTable[settings.difficulty],
-                    depth: 0,
+                    depth: aiMaxDepth[settings.difficulty],
                     rule: rule
                 }
             });
@@ -220,13 +229,12 @@ canvas.addEventListener('click', (event) => {
     const pos = getBoardPosition(event);
     const i = Module._board_get_position(pos.x, pos.y);
 
-    if(aiThinking == false){
+    if (aiThinking == false) {
         worker.postMessage({ type: "PLAYER_MOVE", data: { pos: i } });
     }
 });
 
 window.addEventListener('load', resizeBoard);
 window.addEventListener('resize', resizeBoard);
-
 
 draw();
